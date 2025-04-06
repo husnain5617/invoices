@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Invoice</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      font-family: 'Arial', sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f2f2f2;
+    }
+    .invoice-container {
+      width: 210mm;
+      min-height: 297mm;
+      background: white;
+      padding: 10mm;
+      margin: auto;
+      border: 1px solid #000;
+      box-shadow: 0 0 5px rgba(0,0,0,0.1);
+    }
+    .invoice-title {
+      text-align: left;
+      font-size: 20px;
+      font-weight: bold;
+      margin-bottom: 10px;
+    }
+    .heading-label {
+      font-size: 14px;
+      font-weight: bold;
+      margin-bottom: 5px;
+      display: block;
+    }
+    .invoice-title-input {
+      font-size: 20px;
+      border: none;
+      font-weight: bold;
+      text-align: left;
+      width: 100%;
+    }
+    .header-top {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 20px;
+    }
+    .left-box {
+      border: 1px solid #000;
+      padding: 5px;
+      font-size: 13px;
+      width: 48%;
+    }
+    .left-box div {
+      border: 1px solid #000;
+      border-radius: 12px;
+      padding: 4px;
+      margin-bottom: 5px;
+      display: flex;
+      justify-content: space-between;
+    }
+    .left-box label { font-weight: bold; }
+    .left-box input {
+      border: none;
+      font-size: 13px;
+      width: 50%;
+      text-align: right;
+    }
+    .left-box input[type="tel"] {
+      font-family: monospace;
+      letter-spacing: 1px;
+    }
+    .right-box {
+      font-size: 13px;
+      width: 48%;
+    }
+    .right-box label { font-weight: bold; }
+    .right-box input {
+      border: none;
+      font-size: 13px;
+      width: 100%;
+      text-align: left;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+      margin-top: 10px;
+    }
+    th, td {
+      border: 1px solid #000;
+      padding: 4px;
+      text-align: left;
+    }
+    .amount {
+      text-align: right;
+    }
+    .total-box {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 10px;
+      font-size: 13px;
+    }
+    .left-note {
+      width: 60%;
+      padding: 5px;
+      font-size: 12px;
+    }
+    .right-total {
+      width: 38%;
+    }
+    .right-total table {
+      width: 100%;
+    }
+    .right-total table td:first-child {
+      font-weight: bold;
+      padding-left: 5px;
+    }
+    .right-total table td:last-child {
+      text-align: right;
+      font-weight: bold;
+    }
+    .amount-input {
+      border: none;
+      background: transparent;
+      text-align: right;
+      width: 100%;
+    }
+    .action-btns {
+      margin: 10px 0;
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    .btn {
+      padding: 6px 12px;
+      font-size: 13px;
+      border: 1px solid #000;
+      background-color: #007bff;
+      color: white;
+      cursor: pointer;
+      border-radius: 4px;
+    }
+    .icon-btn {
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 16px;
+    }
+    @media print {
+      .btn, .icon-btn, .action-btns {
+        display: none !important;
+      }
+      .invoice-container {
+        padding: 25mm;
+        border: none;
+        box-shadow: none;
+      }
+      input {
+        border: none !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="invoice-container" id="invoice">
+    <div class="invoice-title">
+      <input type="text" class="invoice-title-input" value="AYUB SANITARY" />
+    </div>
+
+    <div class="header-top">
+      <div class="left-box">
+        <div><label>Mobile #</label><input type="tel" value="0333-4292007"></div>
+        <div><label>Telephone #</label><input type="tel" value="042-37659948"></div>
+        <div><label>Date</label><input type="date" value="2022-05-13"></div>
+        <div><label>Bill No.</label><input type="text" value="4051"></div>
+      </div>
+      <div class="right-box">
+        <p><strong>Estimated Invoice</strong></p>
+        <label>Sold To</label>
+        <input type="text" value="SHAH JI">
+        <input type="text" value="RINALA KHURD">
+        <input type="text" value="0300-46 73 207">
+        <input type="text" value="EHSAAN GOODS">
+        <br>
+        <label>Total Balance</label>
+        <input class="amount-input" type="text" id="total-balance" readonly>
+      </div>
+    </div>
+
+    <table id="invoice-table">
+      <thead>
+        <tr>
+          <th>Qty</th>
+          <th>Description</th>
+          <th>Rate</th>
+          <th>Amount</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody id="invoice-body"></tbody>
+    </table>
+
+    <div class="action-btns">
+      <button class="btn" onclick="addRow()">+ Add Row</button>
+      <button class="btn" onclick="downloadReceiptPDF()">📄 Download PDF</button>
+      <button class="btn" onclick="downloadReceiptImage()">🖼️ Download Image</button>
+    </div>
+
+    <div class="total-box">
+      <div class="left-note">
+        <p>Please Bring Bill For Return/Exchange<br>Without Bill Not Accepted</p>
+      </div>
+      <div class="right-total">
+        <table>
+          <tr><td>Total</td><td id="total">$0.00</td></tr>
+          <tr><td>Payments/Credits</td><td>$0.00</td></tr>
+          <tr><td>Balance Due</td><td id="balance">$0.00</td></tr>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Libraries -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script>window.jsPDF = window.jspdf.jsPDF;</script>
+
+  <script>
+    function addRow() {
+      const tbody = document.getElementById('invoice-body');
+      const row = document.createElement('tr');
+      row.innerHTML = `
+        <td><input type="number" value="1" onchange="recalculate()"></td>
+        <td><input type="text" value=""></td>
+        <td><input type="number" value="0" onchange="recalculate()"></td>
+        <td class="amount">$0.00</td>
+        <td><button class="icon-btn" onclick="removeRow(this)">❌</button></td>
+      `;
+      tbody.appendChild(row);
+      recalculate();
+    }
+
+    function removeRow(button) {
+      button.closest('tr').remove();
+      recalculate();
+    }
+
+    function recalculate() {
+      let total = 0;
+      document.querySelectorAll('#invoice-body tr').forEach(row => {
+        const qty = parseFloat(row.cells[0].querySelector('input').value || 0);
+        const rate = parseFloat(row.cells[2].querySelector('input').value || 0);
+        const amount = qty * rate;
+        row.querySelector('.amount').innerText = `$${amount.toFixed(2)}`;
+        total += amount;
+      });
+      const formatted = `$${total.toLocaleString(undefined, { minimumFractionDigits: 2 })}`;
+      document.getElementById('total').innerText = formatted;
+      document.getElementById('balance').innerText = formatted;
+      document.getElementById('total-balance').value = formatted;
+    }
+
+    function createCleanClone() {
+      const invoice = document.getElementById("invoice");
+      const clone = invoice.cloneNode(true);
+      clone.style.position = 'absolute';
+      clone.style.top = '-9999px';
+      document.body.appendChild(clone);
+
+      const headerRow = clone.querySelector('thead tr');
+      if (headerRow && headerRow.lastElementChild.innerText.toLowerCase().includes("action")) {
+        headerRow.lastElementChild.remove();
+      }
+      clone.querySelectorAll('#invoice-body tr').forEach(row => row.lastElementChild?.remove());
+
+      clone.querySelectorAll('input').forEach(input => {
+        const span = document.createElement('span');
+        span.innerText = input.value;
+        span.style.display = 'inline-block';
+        span.style.minWidth = input.offsetWidth + 'px';
+        input.parentNode.replaceChild(span, input);
+      });
+
+      clone.querySelector('.action-btns')?.remove();
+      return clone;
+    }
+
+    function downloadReceiptImage() {
+      const clone = createCleanClone();
+      html2canvas(clone, { scale: 2, backgroundColor: '#ffffff' }).then(canvas => {
+        const imgLink = document.createElement('a');
+        imgLink.download = 'receipt.png';
+        imgLink.href = canvas.toDataURL('image/png');
+        imgLink.click();
+        document.body.removeChild(clone);
+      });
+    }
+
+    function downloadReceiptPDF() {
+      const clone = createCleanClone();
+      html2canvas(clone, { scale: 2, backgroundColor: '#ffffff' }).then(canvas => {
+        const imgData = canvas.toDataURL('image/jpeg', 1.0);
+        const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+        const pageWidth = 210;
+        const pageHeight = 297;
+        const imgProps = pdf.getImageProperties(imgData);
+        const pdfWidth = pageWidth;
+        const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
+        const marginTop = (pageHeight - pdfHeight) / 2;
+        pdf.addImage(imgData, 'JPEG', 0, marginTop, pdfWidth, pdfHeight);
+        pdf.save("receipt.pdf");
+        document.body.removeChild(clone);
+      });
+    }
+
+    // Initialize
+    addRow();
+  </script>
+</body>
+</html>
